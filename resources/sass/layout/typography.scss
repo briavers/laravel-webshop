@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Oswald');
+
+body {
+    background-color: #7D8777;
+    color: #FFF3DD;
+}
+
+h1, .prose h1,
+h2, .prose h2,
+h3, .prose h3,
+h4, .prose h4,
+h5, .prose h5,
+h6, .prose h6,
+a, .prose a
+{
+    font-family: 'Oswald', sans-serif;
+    color: #FFF3DD;
+}
+
+.prose strong {
+    color: #FFF3DD;
+}
+
+/* Change the white to any color ;) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active  {
+    background: #7D8777 !important;
+    color: #FFF3DD !important;
+}

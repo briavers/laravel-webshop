@@ -1,0 +1,54 @@
+image: registry.gitlab.com/brianverschoore/heksentuin-shop:latest
+
+services:
+  - mysql:5.7
+
+variables:
+  DB_HOST: mysql
+  MYSQL_DATABASE: homestead
+  MYSQL_ROOT_PASSWORD: secret
+  MYSQL_PASSWORD: secret
+
+stages:
+  - test
+  - deploy
+
+unit_test:
+  stage: test
+  script:
+    - cp .env.ci .env.testing
+    - composer install
+    - php artisan key:generate --env testing
+    - vendor/bin/phpunit
+
+deploy_develop:
+  stage: deploy
+  script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY_DEV")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+    - ~/.composer/vendor/bin/envoy run deploy-dev --commit="$CI_COMMIT_SHA"
+  environment:
+    name: develop
+    url: https://shop.foranewbeginning.eu
+  only:
+    - develop
+
+deploy_production:
+  stage: deploy
+  script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY_PROD")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+    - ~/.composer/vendor/bin/envoy run deploy-prod --commit="$CI_COMMIT_SHA"
+  environment:
+    name: production
+    url: http://deheksentuin.be
+  only:
+    - master
